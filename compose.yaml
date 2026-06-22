@@ -1,23 +1,25 @@
 services:
   nginx: 
-    image: nginx:1.32.2  
+    image: nginx
     container_name: proxy
     ports:
       - 80:80
     volumes:
-      - ./config/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./config/nginx/nginx.conf:/etc/nginx/nginx.conf:Z
     networks:
-      - vintao
       - interno
-  
-  postgres-exporter:
-    image: quay.io/prometheuscommunity/postgres-exporter
-    env_file:
-      - .env
+ 
+  nginx-exporter:
+    image: nginx/nginx-prometheus-exporter:1.5.1
+    container_name: nginx-exporter
     ports:
-      - "9187:9187"
+      - 9113:9113
     networks:
       - interno
+    depends_on:
+      - nginx
+    command:
+      - --nginx.scrape-uri=http://nginx/stub_status
 
   postgres:
     image: postgres:16-alpine
@@ -25,22 +27,48 @@ services:
     env_file:
       - .env
     ports:
-      - "5432:5432"
+      - 5432:5432
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 10s
+      start_period: 0s
     volumes:
-      - ./pgdata:/var/lib/postgresql/data
+      - ./pgdata:/var/lib/postgresql:Z
     networks:
       - interno
 
 
-networks:
-  vintao:
-    external: true
+  postgres-exporter:
+    image: quay.io/prometheuscommunity/postgres-exporter
+    container_name: postgres_exporter
+    env_file:
+      - .env
+    ports:
+      - 9187:9187
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - interno
 
+  app1: 
+    image: ghcr.io/lucasterencio/exemplo-api:main
+    container_name: app1
+    ports:
+      - "8000:8000"
+    networks:
+      - interno
+
+  app2:
+    image: ghcr.io/lucasterencio/exemplo-api:main
+    container_name: app2
+    ports:
+      - "8001:8000"
+    networks:
+      - interno  
+
+networks:
   interno:
     external: false

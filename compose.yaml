@@ -89,6 +89,8 @@ services:
     container_name: grafana
     env_file:
       - .env
+    volumes:
+      - ./grafana:/var/lib/grafana:Z
     ports:
       - "3000:3000"
     networks:

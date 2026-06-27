@@ -12,8 +12,6 @@ services:
   nginx-exporter:
     image: nginx/nginx-prometheus-exporter:1.5.1
     container_name: nginxex
-    ports:
-      - 9113:9113
     networks:
       - interno
     depends_on:
@@ -26,8 +24,6 @@ services:
     container_name: postgres
     env_file:
       - .env
-    ports:
-      - 5432:5432
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 10s
@@ -45,8 +41,6 @@ services:
     container_name: postgresex
     env_file:
       - .env
-    ports:
-      - 9187:9187
     depends_on:
       postgres:
         condition: service_healthy
@@ -56,16 +50,16 @@ services:
   app1: 
     image: ghcr.io/lucasterencio/exemplo-api:main
     container_name: app1
-    ports:
-      - "8000:8000"
+    environment:
+      - DB_HOST=postgres
     networks: 
       - interno
 
   app2:
     image: ghcr.io/lucasterencio/exemplo-api:main
     container_name: app2
-    ports:
-      - "8001:8000"
+    environment:
+      - DB_HOST=postgres
     networks:
       - interno  
 
@@ -81,8 +75,6 @@ services:
       - '--storage.tsdb.path=/prometheus'
     networks:
       - interno
-    ports:
-      - '9090:9090'
 
   grafana:
     image: grafana/grafana
@@ -91,8 +83,9 @@ services:
       - .env
     volumes:
       - ./grafana:/var/lib/grafana:Z
-    ports:
-      - "3000:3000"
+      - ./config/grafana/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml:Z
+      - ./config/grafana/dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yml:Z
+      - ./config/grafana/dashboards:/var/lib/grafana/dashboards:Z
     networks:
       - interno
 

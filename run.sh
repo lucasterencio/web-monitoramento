@@ -10,7 +10,7 @@ setup() {
     for i in "${directories[@]}"; do
 	if [[ ! -d $i ]]; then
 	    mkdir $i
-	    chmod 777 $i
+	    chmod -R 777 $i
 	fi
     done
 }

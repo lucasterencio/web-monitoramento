@@ -48,18 +48,27 @@ services:
       - interno
 
   app1: 
-    image: ghcr.io/lucasterencio/exemplo-api:main
+    image: ghcr.io/lucasterencio/exemplo-api:latest
     container_name: app1
     environment:
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
       - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=${POSTGRES_DB}
     networks: 
       - interno
 
   app2:
-    image: ghcr.io/lucasterencio/exemplo-api:main
+    image: ghcr.io/lucasterencio/exemplo-api:latest
     container_name: app2
     environment:
       - DB_HOST=postgres
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=${POSTGRES_DB}
     networks:
       - interno  
 

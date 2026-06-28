@@ -34,6 +34,8 @@ case $1 in
     -t|--stop)
 	docker compose down
 	;;
+    -m|--monitoring)
+	docker compose stats 
     *)
 	usage
 	;;

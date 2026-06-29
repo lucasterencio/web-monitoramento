@@ -1,3 +1,4 @@
 .env
-grafana/**
-prometheus/**
+grafana/*
+prometheus/*
+pgdata

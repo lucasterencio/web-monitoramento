@@ -9,16 +9,6 @@ services:
     networks:
       - interno
  
-  nginx-exporter:
-    image: nginx/nginx-prometheus-exporter:1.5.1
-    container_name: nginxex
-    networks:
-      - interno
-    depends_on:
-      - nginx
-    command:
-      - --nginx.scrape-uri=http://nginx/stub_status
-
   postgres:
     image: postgres:16-alpine
     container_name: postgres
@@ -33,18 +23,6 @@ services:
     volumes:
       - ./pgdata:/var/lib/postgresql/data:Z
     networks:
-      - interno
-
-
-  postgres-exporter:
-    image: quay.io/prometheuscommunity/postgres-exporter
-    container_name: postgresex
-    env_file:
-      - .env
-    depends_on:
-      postgres:
-        condition: service_healthy
-    networks: 
       - interno
 
   app1: 
@@ -98,6 +76,27 @@ services:
     networks:
       - interno
 
+  nginx-exporter:
+    image: nginx/nginx-prometheus-exporter:1.5.1
+    container_name: nginxex
+    networks:
+      - interno
+    depends_on:
+      - nginx
+    command:
+      - --nginx.scrape-uri=http://nginx/stub_status
+  postgres-exporter:
+    image: quay.io/prometheuscommunity/postgres-exporter
+    container_name: postgresex
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: 
+      - interno
+
+ 
 networks:
   interno:
     external: false

@@ -36,6 +36,7 @@ case $1 in
 	;;
     -m|--monitoring)
 	docker compose stats 
+	;;
     *)
 	usage
 	;;
